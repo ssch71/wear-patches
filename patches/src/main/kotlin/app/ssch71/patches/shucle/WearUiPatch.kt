@@ -24,7 +24,7 @@ val wearUiPatch = patch(
         ShucleMainActivityOnCreateFingerprint.method.addInstructions(
             0,
             """
-                invoke-static {p0}, ${EXTENSION_CLASS}->onCreate(Landroid/app/Activity;)V
+                invoke-static/range {p0 .. p0}, ${EXTENSION_CLASS}->onCreate(Landroid/app/Activity;)V
             """
         )
     }
