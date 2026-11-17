@@ -76,7 +76,7 @@ private fun callPendingIntent(context: Context, target: String): PendingIntent {
 @Composable
 private fun CallButton(label: String, target: String) {
     RemoteButton(
-        onClick = rememberPendingIntentAction { ctx -> callPendingIntent(ctx, target) },
+        onClick = rememberPendingIntentAction { ctx: Context -> callPendingIntent(ctx, target) },
         modifier = RemoteModifier.fillMaxWidth(),
     ) {
         RemoteText(text = label.rs)

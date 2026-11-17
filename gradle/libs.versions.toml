@@ -8,13 +8,13 @@ gson = "2.15.0"
 compose-bom = { group = "androidx.compose", name = "compose-bom", version = "2026.05.00" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version = "1.11.1" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
-remote-core = { module = "androidx.compose.remote:remote-core", version = "1.0.0-alpha20" }
-remote-creation = { module = "androidx.compose.remote:remote-creation", version = "1.0.0-alpha20" }
-remote-creation-core = { module = "androidx.compose.remote:remote-creation-core", version = "1.0.0-alpha20" }
-remote-creation-compose = { module = "androidx.compose.remote:remote-creation-compose", version = "1.0.0-alpha20" }
-remote-material3 = { module = "androidx.wear.compose.remote:remote-material3", version = "1.0.0-alpha12" }
-glance-wear = { module = "androidx.glance.wear:wear", version = "1.0.0-alpha19" }
-glance-wear-core = { module = "androidx.glance.wear:wear-core", version = "1.0.0-alpha19" }
+remote-core = { module = "androidx.compose.remote:remote-core", version = "1.0.0-alpha+" }
+remote-creation = { module = "androidx.compose.remote:remote-creation", version = "1.0.0-alpha+" }
+remote-creation-core = { module = "androidx.compose.remote:remote-creation-core", version = "1.0.0-alpha+" }
+remote-creation-compose = { module = "androidx.compose.remote:remote-creation-compose", version = "1.0.0-alpha+" }
+remote-material3 = { module = "androidx.wear.compose.remote:remote-material3", version = "1.0.0-alpha+" }
+glance-wear = { module = "androidx.glance.wear:wear", version = "1.0.0-alpha+" }
+glance-wear-core = { module = "androidx.glance.wear:wear-core", version = "1.0.0-alpha+" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 # Gradle plugins adds the dependency during build, this declaration is here only for dependabot to provide updates.
 #noinspection UnusedVersionCatalogEntry
