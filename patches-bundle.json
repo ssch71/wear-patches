@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-17T07:11:00",
-  "description": "## [1.1.0-dev.1](https://github.com/ssch71/wear-patches/compare/v1.0.1-dev.1...v1.1.0-dev.1) (2026-11-17)\n\n### ✨ New Features\n\n* **shucle:** Add width and vertical inset options to Wear UI ([542d240](https://github.com/ssch71/wear-patches/commit/542d240e98d4619d48660b49f8c82962f94bcfd8))",
-  "download_url": "https://github.com/ssch71/wear-patches/releases/download/v1.1.0-dev.1/patches-1.1.0-dev.1.mpp",
+  "created_at": "2026-11-17T07:52:02",
+  "description": "## [1.1.0-dev.2](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-11-17)\n\n### ✨ New Features\n\n* **shucle:** Add Wear OS 7 widget patch ([00f7fb4](https://github.com/ssch71/wear-patches/commit/00f7fb4e3156859a8ce2ac9fc4e4da835c90e9ad))\n\n### 🐛 Bug Fixes\n\n* **widget:** Build pending intent action via reflection ([9e48202](https://github.com/ssch71/wear-patches/commit/9e48202d0fde7798c1f744a215bfc36879caecba))\n* **widget:** Use latest Remote Compose alpha for pending intent actions ([73a4b97](https://github.com/ssch71/wear-patches/commit/73a4b973f13cef8d53eb90b147b094447ddf4feb))",
+  "download_url": "https://github.com/ssch71/wear-patches/releases/download/v1.1.0-dev.2/patches-1.1.0-dev.2.mpp",
   "signature_download_url": "",
-  "version": "1.1.0-dev.1"
+  "version": "1.1.0-dev.2"
 }

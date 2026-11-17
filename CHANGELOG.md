@@ -1,3 +1,14 @@
+## [1.1.0-dev.2](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-11-17)
+
+### ✨ New Features
+
+* **shucle:** Add Wear OS 7 widget patch ([00f7fb4](https://github.com/ssch71/wear-patches/commit/00f7fb4e3156859a8ce2ac9fc4e4da835c90e9ad))
+
+### 🐛 Bug Fixes
+
+* **widget:** Build pending intent action via reflection ([9e48202](https://github.com/ssch71/wear-patches/commit/9e48202d0fde7798c1f744a215bfc36879caecba))
+* **widget:** Use latest Remote Compose alpha for pending intent actions ([73a4b97](https://github.com/ssch71/wear-patches/commit/73a4b973f13cef8d53eb90b147b094447ddf4feb))
+
 ## [1.1.0-dev.1](https://github.com/ssch71/wear-patches/compare/v1.0.1-dev.1...v1.1.0-dev.1) (2026-11-17)
 
 ### ✨ New Features

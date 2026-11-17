@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.1.0-dev.1",
+  "version": "1.1.0-dev.2",
   "patches": [
     {
       "name": "Wear UI",
@@ -57,6 +57,33 @@
           }
         }
       ]
+    },
+    {
+      "name": "Wear Widget",
+      "description": "Wear OS 7 위젯(반 크기 타일)으로 집/학교 호출 버튼을 추가합니다.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.hyundai.airlab.shucle",
+          "name": "셔클",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#1E64FF",
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": null,
+              "versionCodes": null,
+              "isExperimental": true,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
     }
   ]
 }
