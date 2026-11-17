@@ -24,12 +24,14 @@ import androidx.compose.remote.creation.compose.modifier.background
 import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.clip
 import androidx.compose.remote.creation.compose.modifier.fillMaxSize
+import androidx.compose.remote.creation.compose.modifier.fillMaxHeight
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
 import androidx.compose.remote.creation.compose.modifier.padding
 import androidx.compose.remote.creation.compose.modifier.size
 import androidx.compose.remote.creation.compose.shapes.RemoteCircleShape
 import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rdp
+import androidx.compose.remote.creation.compose.state.rf
 import androidx.compose.remote.creation.compose.state.rs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -43,7 +45,7 @@ import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
 import androidx.glance.wear.core.ContainerInfo
 import androidx.glance.wear.core.WearWidgetParams
-import androidx.glance.wear.horizontalGradient
+import androidx.glance.wear.verticalGradient
 import androidx.wear.compose.remote.material3.RemoteIcon
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
@@ -57,10 +59,11 @@ const val EXTRA_DEST_NAME = "wear_dest_name"
 const val EXTRA_DEST_LAT = "wear_dest_lat"
 const val EXTRA_DEST_LNG = "wear_dest_lng"
 
-// 삼성 인터넷 위젯 톤: 남보라 그라데이션 + 반투명 원형 버튼
-private val BG_START = Color(0xFF26246E)
-private val BG_END = Color(0xFF3A2E9C)
-private val CIRCLE = Color(0x59000000)
+// 셔클 아이콘 배경(#2462F7) 기반, 블러처럼 번지는 그라데이션
+private val BG_TOP = Color(0xFF4A86FF)
+private val BG_MID = Color(0xFF2462F7)
+private val BG_BOTTOM = Color(0xFF1846C4)
+private val CIRCLE = Color(0x40001A66)
 private val ON_BG = Color(0xFFFFFFFF)
 
 @AssociateWithGlanceWearWidget(ShucleWidget::class)
@@ -89,12 +92,13 @@ class ShucleWidget : GlanceWearWidget() {
             )
         }
 
-        // 컨테이너에 맞춰 원 크기 계산 (2열 기준)
-        val cell = minOf(params.widthDp / 2f, (params.heightDp - 8f) / rows)
-        val circleDp = (cell * 0.86f).toInt().coerceIn(40, 96)
+        // 칸(2열 x rows행)에 꽉 맞는 원 지름
+        val cellW = (params.widthDp - 8f) / 2f
+        val cellH = (params.heightDp - 8f) / rows
+        val circleDp = (minOf(cellW, cellH) - 4f).toInt().coerceAtLeast(40)
 
         return WearWidgetDocument(
-            background = WearWidgetBrush.horizontalGradient(listOf(BG_START.rc, BG_END.rc))
+            background = WearWidgetBrush.verticalGradient(listOf(BG_TOP.rc, BG_MID.rc, BG_BOTTOM.rc))
         ) {
             ShucleWidgetContent(items, circleDp)
         }
@@ -159,25 +163,30 @@ private fun pendingIntentAction(pendingIntent: () -> PendingIntent): RemoteActio
 
 @RemoteComposable
 @Composable
-private fun FavoriteCircle(item: WidgetItem, circleDp: Int) {
+private fun FavoriteCircle(item: WidgetItem, circleDp: Int, cellModifier: RemoteModifier) {
+    // 칸 전체가 터치 영역
     RemoteBox(
-        modifier = RemoteModifier
-            .size(circleDp.rdp)
-            .clip(RemoteCircleShape)
-            .background(CIRCLE.rc)
-            .clickable(item.action),
+        modifier = cellModifier.clickable(item.action),
         contentAlignment = RemoteAlignment.Center,
     ) {
-        RemoteColumn(horizontalAlignment = RemoteAlignment.CenterHorizontally) {
-            item.icon?.let {
-                RemoteIcon(
-                    imageVector = it,
-                    contentDescription = null,
-                    modifier = RemoteModifier.size((circleDp * 0.32f).toInt().rdp),
-                    tint = ON_BG.rc,
-                )
+        RemoteBox(
+            modifier = RemoteModifier
+                .size(circleDp.rdp)
+                .clip(RemoteCircleShape)
+                .background(CIRCLE.rc),
+            contentAlignment = RemoteAlignment.Center,
+        ) {
+            RemoteColumn(horizontalAlignment = RemoteAlignment.CenterHorizontally) {
+                item.icon?.let {
+                    RemoteIcon(
+                        imageVector = it,
+                        contentDescription = null,
+                        modifier = RemoteModifier.size((circleDp * 0.30f).toInt().rdp),
+                        tint = ON_BG.rc,
+                    )
+                }
+                RemoteText(text = item.label.rs, color = ON_BG.rc, maxLines = 1)
             }
-            RemoteText(text = item.label.rs, color = ON_BG.rc, maxLines = 1)
         }
     }
 }
@@ -195,17 +204,21 @@ fun ShucleWidgetContent(items: List<WidgetItem>, circleDp: Int) {
             }
         } else {
             RemoteColumn(
-                modifier = RemoteModifier.fillMaxSize().padding(6.rdp),
+                modifier = RemoteModifier.fillMaxSize().padding(4.rdp),
                 verticalArrangement = RemoteArrangement.SpaceEvenly,
                 horizontalAlignment = RemoteAlignment.CenterHorizontally,
             ) {
                 items.chunked(2).forEach { row ->
                     RemoteRow(
-                        modifier = RemoteModifier.fillMaxWidth(),
-                        horizontalArrangement = RemoteArrangement.SpaceEvenly,
+                        modifier = RemoteModifier.fillMaxWidth().weight(1f.rf),
                         verticalAlignment = RemoteAlignment.CenterVertically,
                     ) {
-                        row.forEach { FavoriteCircle(it, circleDp) }
+                        row.forEach {
+                            FavoriteCircle(
+                                it, circleDp,
+                                RemoteModifier.weight(1f.rf).fillMaxHeight(),
+                            )
+                        }
                     }
                 }
             }

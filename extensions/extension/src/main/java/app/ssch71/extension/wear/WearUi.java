@@ -6,11 +6,14 @@ package app.ssch71.extension.wear;
 import android.app.Activity;
 import android.app.Application;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Outline;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class WearUi {
@@ -64,13 +67,31 @@ public final class WearUi {
     private static void applyRoundInset(Activity activity) {
         Resources res = activity.getResources();
         if (!isRound(res)) return;
-        View content = activity.findViewById(android.R.id.content);
+        final View content = activity.findViewById(android.R.id.content);
         if (content == null) return;
         DisplayMetrics dm = res.getDisplayMetrics();
         int shortPx = Math.min(dm.widthPixels, dm.heightPixels);
         int h = Math.round(shortPx * ROUND_INSET_RATIO);
         int v = Math.round(shortPx * verticalInsetRatio);
         content.setPadding(h, v, h, v);
+
+        // 인셋 바깥은 베젤과 이어지게 검정
+        activity.getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+
+        // 콘텐츠 영역을 둥근 창처럼 클리핑 (density 오버라이드와 무관하게 실제 px 기준)
+        final float radius = shortPx * 0.08f;
+        content.setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                outline.setRoundRect(
+                        view.getPaddingLeft(),
+                        view.getPaddingTop(),
+                        view.getWidth() - view.getPaddingRight(),
+                        view.getHeight() - view.getPaddingBottom(),
+                        radius);
+            }
+        });
+        content.setClipToOutline(true);
     }
 
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
