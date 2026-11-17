@@ -117,7 +117,9 @@ private fun vector(context: Context, name: String): RemoteImageVector? = try {
 
 /** 셔클을 목적지 정보와 함께 열기. 예약 화면 진입은 다음 단계 패치에서 처리 */
 private fun openShucle(context: Context, fav: FavoriteCache.Item): PendingIntent {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("shucle://drthome"))
+    val ids = FavoriteCache.drtIds(context)
+    val link = if (ids != null) "shucle://drt?mobility_service_ids=$ids" else WidgetLaunch.DRT_HOME
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
         .setComponent(ComponentName(context.packageName, MAIN_ACTIVITY))
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         .putExtra(EXTRA_FAVORITE_ID, fav.id)

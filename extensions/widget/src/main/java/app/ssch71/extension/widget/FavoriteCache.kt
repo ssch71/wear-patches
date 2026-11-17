@@ -12,6 +12,7 @@ import org.json.JSONObject
 object FavoriteCache {
     private const val PREFS = "ssch71_wear_widget"
     private const val KEY = "favorites"
+    private const val KEY_DRT_IDS = "drt_ids"
 
     data class Item(
         val id: String,
@@ -47,6 +48,23 @@ object FavoriteCache {
         } catch (_: Throwable) {
         }
     }
+
+    /** AppConfig.ModalityMenu 생성자 시작에서 호출. DRT 메뉴의 서비스 ID 저장 */
+    @JvmStatic
+    fun recordMenu(ids: Any?, menuType: Any?) {
+        try {
+            if (menuType?.toString() != "MENU_TYPE_DRT") return
+            val list = (ids as? List<*>)?.mapNotNull { (it as? String)?.takeIf(String::isNotBlank) }
+            if (list.isNullOrEmpty()) return
+            val context = application() ?: return
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(KEY_DRT_IDS, list.joinToString(",")).apply()
+        } catch (_: Throwable) {
+        }
+    }
+
+    fun drtIds(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_DRT_IDS, null)
 
     /** 집이 먼저, 나머지는 처음 등록된 순서 */
     fun load(context: Context): List<Item> {

@@ -18,12 +18,14 @@ object WidgetLaunch {
 
     @Volatile private var pendingId: String? = null
     @Volatile private var pendingAt = 0L
+    @Volatile private var pendingUri: Uri? = null
     private val main = Handler(Looper.getMainLooper())
 
     private fun take(intent: Intent?): Boolean {
         val id = intent?.getStringExtra(EXTRA_FAVORITE_ID) ?: return false
         pendingId = id
         pendingAt = SystemClock.elapsedRealtime()
+        pendingUri = intent.data
         intent.removeExtra(EXTRA_FAVORITE_ID)
         return true
     }
@@ -36,7 +38,7 @@ object WidgetLaunch {
             if (pendingId == null || activity.isFinishing || activity.isDestroyed) return@postDelayed
             try {
                 activity.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse(DRT_HOME))
+                    Intent(Intent.ACTION_VIEW, pendingUri ?: Uri.parse(DRT_HOME))
                         .setComponent(ComponentName(activity, activity.javaClass))
                         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 )

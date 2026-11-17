@@ -19,6 +19,8 @@ private const val WIDGET_SERVICE = "app.ssch71.extension.widget.ShucleWidgetServ
 private const val FAVORITE_CACHE = "Lapp/ssch71/extension/widget/FavoriteCache;"
 private const val WIDGET_LAUNCH = "Lapp/ssch71/extension/widget/WidgetLaunch;"
 private const val FAVORITE_TYPE = "Lcom/hyundai/airlab/shucle/core/domain/model/Favorite;"
+private const val MODALITY_MENU = "Lcom/hyundai/airlab/shucle/core/domain/model/home/AppConfig\$ModalityMenu;"
+private const val MENU_TYPE = "Lcom/hyundai/airlab/shucle/core/domain/model/MenuType;"
 
 private val WIDGET_INFO = """
     <?xml version="1.0" encoding="utf-8"?>
@@ -49,6 +51,21 @@ val wearWidgetPatch = patch(
             0,
             "invoke-static/range {p0 .. p0}, ${WIDGET_LAUNCH}->onActivityCreated(Landroid/app/Activity;)V",
         )
+
+        // DRT 메뉴 카드의 mobilityServiceIds 수집 (일반 생성자 + 직렬화 생성자)
+        mutableClassDefBy(MODALITY_MENU).methods
+            .filter { it.name == "<init>" }
+            .forEach { ctor ->
+                val params = ctor.parameterTypes.map { it.toString() }
+                val typeIndex = params.indexOf(MENU_TYPE)
+                if (typeIndex < 1 || params[typeIndex - 1] != "Ljava/util/List;") return@forEach
+                // 앞쪽 파라미터에 long/double이 없어서 p 번호 = 인덱스 + 1
+                val listReg = typeIndex
+                ctor.addInstruction(
+                    0,
+                    "invoke-static/range {p$listReg .. p${listReg + 1}}, ${FAVORITE_CACHE}->recordMenu(Ljava/lang/Object;Ljava/lang/Object;)V",
+                )
+            }
 
         // 셔클이 이미 떠 있을 때 들어오는 위젯 인텐트
         ShucleMainActivityOnNewIntentFingerprint.method.addInstruction(
