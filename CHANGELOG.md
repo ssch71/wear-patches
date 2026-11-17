@@ -1,3 +1,9 @@
+## [1.1.0-dev.6](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.5...v1.1.0-dev.6) (2026-11-17)
+
+### 🐛 Bug Fixes
+
+* **widget:** Redeliver DRT home deep link after cold start ([79af558](https://github.com/ssch71/wear-patches/commit/79af5588fd019a18cadcf1eed7a20f5259e207ce))
+
 ## [1.1.0-dev.5](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2026-11-17)
 
 ### ✨ New Features
