@@ -19,7 +19,7 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.1.0-dev.4](https://github.com/ssch71/wear-patches/releases/tag/v1.1.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.1.0-dev.5](https://github.com/ssch71/wear-patches/releases/tag/v1.1.0-dev.5)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
 <details open>
 <summary>📦 셔클&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
@@ -28,7 +28,7 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Wear UI](#wear-ui) | 원형 워치 화면에 맞게 density를 낮추고 원형 인셋 패딩을 적용합니다. | • 화면 폭<br>• 상하 여백 |
+| [Wear UI](#wear-ui) | 원형 워치 화면에 맞게 density를 낮추고 원형 인셋 패딩을 적용합니다. | • 화면 폭<br>• 상하 여백<br>• 글자 배율 |
 | [Wear Widget](#wear-widget) | Wear OS 7 위젯(반 크기 타일)으로 집/학교 호출 버튼을 추가합니다. |  |
 
 </details>

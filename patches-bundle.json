@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-17T08:21:02",
-  "description": "## [1.1.0-dev.4](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2026-11-17)\n\n### ✨ New Features\n\n* **widget:** Shucle blue blur background, full-cell touch targets, rounded app window ([4898d4a](https://github.com/ssch71/wear-patches/commit/4898d4aa0a3c73ebae48dc598a966df8e570625b))",
-  "download_url": "https://github.com/ssch71/wear-patches/releases/download/v1.1.0-dev.4/patches-1.1.0-dev.4.mpp",
+  "created_at": "2026-11-17T08:37:03",
+  "description": "## [1.1.0-dev.5](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2026-11-17)\n\n### ✨ New Features\n\n* **widget:** Bigger buttons, one-tap favorite routing, font scale option ([3a1d198](https://github.com/ssch71/wear-patches/commit/3a1d198ae78f7388b6c343a7cbe8c47cf0ec10a1))",
+  "download_url": "https://github.com/ssch71/wear-patches/releases/download/v1.1.0-dev.5/patches-1.1.0-dev.5.mpp",
   "signature_download_url": "",
-  "version": "1.1.0-dev.4"
+  "version": "1.1.0-dev.5"
 }

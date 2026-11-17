@@ -1,3 +1,9 @@
+## [1.1.0-dev.5](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.4...v1.1.0-dev.5) (2026-11-17)
+
+### ✨ New Features
+
+* **widget:** Bigger buttons, one-tap favorite routing, font scale option ([3a1d198](https://github.com/ssch71/wear-patches/commit/3a1d198ae78f7388b6c343a7cbe8c47cf0ec10a1))
+
 ## [1.1.0-dev.4](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2026-11-17)
 
 ### ✨ New Features
