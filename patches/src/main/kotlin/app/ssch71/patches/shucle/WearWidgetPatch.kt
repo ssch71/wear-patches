@@ -50,6 +50,12 @@ val wearWidgetPatch = patch(
             "invoke-static/range {p0 .. p0}, ${WIDGET_LAUNCH}->onActivityCreated(Landroid/app/Activity;)V",
         )
 
+        // 셔클이 이미 떠 있을 때 들어오는 위젯 인텐트
+        ShucleMainActivityOnNewIntentFingerprint.method.addInstruction(
+            0,
+            "invoke-static/range {p1 .. p1}, ${WIDGET_LAUNCH}->onNewIntent(Landroid/content/Intent;)V",
+        )
+
         // static void xxx(Favorite, 클릭람다, Composer, int) 형태 칩 컴포저블 진입부 훅
         val chipMethods = mutableListOf<Pair<String, String>>()
         classDefForEach { classDef ->

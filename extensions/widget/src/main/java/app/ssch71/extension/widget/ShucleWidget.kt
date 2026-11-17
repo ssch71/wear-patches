@@ -119,7 +119,7 @@ private fun vector(context: Context, name: String): RemoteImageVector? = try {
 private fun openShucle(context: Context, fav: FavoriteCache.Item): PendingIntent {
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("shucle://drthome"))
         .setComponent(ComponentName(context.packageName, MAIN_ACTIVITY))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         .putExtra(EXTRA_FAVORITE_ID, fav.id)
         .putExtra(EXTRA_DEST_NAME, fav.name)
         .putExtra(EXTRA_DEST_LAT, fav.lat)

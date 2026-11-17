@@ -17,3 +17,10 @@ object FavoriteMapperFingerprint : Fingerprint(
     returnType = "Lcom/hyundai/airlab/shucle/core/domain/model/Favorite;",
     parameters = listOf("Lridergwv1/Place\$Favorite;"),
 )
+
+object ShucleMainActivityOnNewIntentFingerprint : Fingerprint(
+    definingClass = "Lcom/hyundai/airlab/shucle/presenter/MainActivity;",
+    name = "onNewIntent",
+    returnType = "V",
+    parameters = listOf("Landroid/content/Intent;"),
+)
