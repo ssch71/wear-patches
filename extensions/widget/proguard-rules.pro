@@ -5,3 +5,5 @@
 -repackageclasses 'app.ssch71.extension.widget.r'
 -allowaccessmodification
 -dontwarn **
+# 리플렉션으로 생성하는 액션 클래스는 이름과 생성자 유지
+-keep class androidx.compose.remote.creation.compose.action.PendingIntentAction { <init>(...); }

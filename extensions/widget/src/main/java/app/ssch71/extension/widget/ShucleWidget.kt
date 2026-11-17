@@ -10,7 +10,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import androidx.compose.remote.creation.compose.action.rememberPendingIntentAction
+import androidx.compose.remote.creation.compose.action.RemoteAction
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteArrangement
 import androidx.compose.remote.creation.compose.layout.RemoteColumn
@@ -37,6 +37,8 @@ import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
 
 private const val MAIN_ACTIVITY = "com.hyundai.airlab.shucle.presenter.MainActivity"
+private const val PENDING_INTENT_ACTION =
+    "androidx.compose.remote.creation.compose.action.PendingIntentAction"
 const val EXTRA_WEAR_CALL = "wear_call"
 
 @AssociateWithGlanceWearWidget(ShucleWidget::class)
@@ -50,10 +52,12 @@ class ShucleWidget : GlanceWearWidget() {
         params: WearWidgetParams,
     ): WearWidgetData {
         val large = params.containerType == ContainerInfo.CONTAINER_TYPE_LARGE
+        val home = pendingIntentAction { callPendingIntent(context, "home") }
+        val school = pendingIntentAction { callPendingIntent(context, "school") }
         return WearWidgetDocument(
             background = WearWidgetBrush.color(RemoteColorScheme().surfaceContainer)
         ) {
-            ShucleWidgetContent(large)
+            ShucleWidgetContent(large, home, school)
         }
     }
 }
@@ -72,11 +76,45 @@ private fun callPendingIntent(context: Context, target: String): PendingIntent {
     )
 }
 
+/**
+ * PendingIntentAction의 공개 API가 알파 버전마다 바뀌어서 생성자를 직접 찾아 씀.
+ * 첫 파라미터가 PendingIntent인 구버전과 () -> PendingIntent인 신버전 모두 지원.
+ */
+private fun pendingIntentAction(pendingIntent: () -> PendingIntent): RemoteAction {
+    val cls = Class.forName(PENDING_INTENT_ACTION)
+    for (ctor in cls.declaredConstructors.sortedBy { it.parameterTypes.size }) {
+        val types = ctor.parameterTypes
+        if (types.isEmpty()) continue
+        val first: Any = when {
+            types[0] == PendingIntent::class.java -> pendingIntent()
+            Function0::class.java.isAssignableFrom(types[0]) -> pendingIntent
+            else -> continue
+        }
+        val args = arrayOfNulls<Any>(types.size)
+        args[0] = first
+        for (i in 1 until types.size) {
+            args[i] = when {
+                List::class.java.isAssignableFrom(types[i]) -> emptyList<Any>()
+                types[i] == Int::class.javaPrimitiveType -> 0
+                types[i] == Boolean::class.javaPrimitiveType -> false
+                else -> null
+            }
+        }
+        try {
+            ctor.isAccessible = true
+            return ctor.newInstance(*args) as RemoteAction
+        } catch (_: ReflectiveOperationException) {
+        } catch (_: IllegalArgumentException) {
+        }
+    }
+    error("No usable constructor in $PENDING_INTENT_ACTION")
+}
+
 @RemoteComposable
 @Composable
-private fun CallButton(label: String, target: String) {
+private fun CallButton(label: String, action: RemoteAction) {
     RemoteButton(
-        onClick = rememberPendingIntentAction { ctx: Context -> callPendingIntent(ctx, target) },
+        onClick = action,
         modifier = RemoteModifier.fillMaxWidth(),
     ) {
         RemoteText(text = label.rs)
@@ -85,16 +123,16 @@ private fun CallButton(label: String, target: String) {
 
 @RemoteComposable
 @Composable
-fun ShucleWidgetContent(large: Boolean) {
+fun ShucleWidgetContent(large: Boolean, home: RemoteAction, school: RemoteAction) {
     RemoteMaterialTheme {
         RemoteColumn(
             modifier = RemoteModifier.fillMaxSize().padding(8.rdp),
             verticalArrangement = RemoteArrangement.spacedBy(6.rdp),
             horizontalAlignment = RemoteAlignment.CenterHorizontally,
         ) {
-            CallButton("집으로", "home")
+            CallButton("집으로", home)
             if (large) {
-                CallButton("학교로", "school")
+                CallButton("학교로", school)
             }
         }
     }
