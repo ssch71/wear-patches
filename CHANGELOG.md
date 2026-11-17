@@ -1,3 +1,9 @@
+## [1.1.0-dev.4](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2026-11-17)
+
+### ✨ New Features
+
+* **widget:** Shucle blue blur background, full-cell touch targets, rounded app window ([4898d4a](https://github.com/ssch71/wear-patches/commit/4898d4aa0a3c73ebae48dc598a966df8e570625b))
+
 ## [1.1.0-dev.3](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2026-11-17)
 
 ### ✨ New Features
