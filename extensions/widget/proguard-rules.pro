@@ -7,3 +7,5 @@
 -dontwarn **
 # 리플렉션으로 생성하는 액션 클래스는 이름과 생성자 유지
 -keep class androidx.compose.remote.creation.compose.action.PendingIntentAction { <init>(...); }
+# 셔클 바이트코드에서 직접 호출
+-keep class app.ssch71.extension.widget.FavoriteCache { *; }

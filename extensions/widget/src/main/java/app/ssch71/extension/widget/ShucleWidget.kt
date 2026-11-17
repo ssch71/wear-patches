@@ -11,40 +11,64 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.compose.remote.creation.compose.action.RemoteAction
+import androidx.compose.remote.creation.compose.capture.RemoteImageVector
+import androidx.compose.remote.creation.compose.capture.toRemoteImageVector
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteArrangement
+import androidx.compose.remote.creation.compose.layout.RemoteBox
 import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
+import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
+import androidx.compose.remote.creation.compose.modifier.background
+import androidx.compose.remote.creation.compose.modifier.clickable
+import androidx.compose.remote.creation.compose.modifier.clip
 import androidx.compose.remote.creation.compose.modifier.fillMaxSize
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
 import androidx.compose.remote.creation.compose.modifier.padding
+import androidx.compose.remote.creation.compose.modifier.size
+import androidx.compose.remote.creation.compose.shapes.RemoteCircleShape
+import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rdp
 import androidx.compose.remote.creation.compose.state.rs
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.glance.wear.AssociateWithGlanceWearWidget
 import androidx.glance.wear.GlanceWearWidget
 import androidx.glance.wear.GlanceWearWidgetService
 import androidx.glance.wear.WearWidgetBrush
 import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
-import androidx.glance.wear.color
 import androidx.glance.wear.core.ContainerInfo
 import androidx.glance.wear.core.WearWidgetParams
-import androidx.wear.compose.remote.material3.RemoteButton
-import androidx.wear.compose.remote.material3.RemoteColorScheme
+import androidx.glance.wear.horizontalGradient
+import androidx.wear.compose.remote.material3.RemoteIcon
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteText
 
 private const val MAIN_ACTIVITY = "com.hyundai.airlab.shucle.presenter.MainActivity"
 private const val PENDING_INTENT_ACTION =
     "androidx.compose.remote.creation.compose.action.PendingIntentAction"
-const val EXTRA_WEAR_CALL = "wear_call"
+
+const val EXTRA_FAVORITE_ID = "wear_favorite_id"
+const val EXTRA_DEST_NAME = "wear_dest_name"
+const val EXTRA_DEST_LAT = "wear_dest_lat"
+const val EXTRA_DEST_LNG = "wear_dest_lng"
+
+// 삼성 인터넷 위젯 톤: 남보라 그라데이션 + 반투명 원형 버튼
+private val BG_START = Color(0xFF26246E)
+private val BG_END = Color(0xFF3A2E9C)
+private val CIRCLE = Color(0x59000000)
+private val ON_BG = Color(0xFFFFFFFF)
 
 @AssociateWithGlanceWearWidget(ShucleWidget::class)
 class ShucleWidgetService : GlanceWearWidgetService() {
     override val widget: GlanceWearWidget = ShucleWidget()
 }
+
+class WidgetItem(val label: String, val icon: RemoteImageVector?, val action: RemoteAction)
 
 class ShucleWidget : GlanceWearWidget() {
     override suspend fun provideWidgetData(
@@ -52,34 +76,57 @@ class ShucleWidget : GlanceWearWidget() {
         params: WearWidgetParams,
     ): WearWidgetData {
         val large = params.containerType == ContainerInfo.CONTAINER_TYPE_LARGE
-        val home = pendingIntentAction { callPendingIntent(context, "home") }
-        val school = pendingIntentAction { callPendingIntent(context, "school") }
+        val slots = if (large) 4 else 2
+        val rows = if (large) 2 else 1
+
+        val homeIcon = vector(context, "ico_home_fill")
+        val placeIcon = vector(context, "ico_star_fill")
+        val items = FavoriteCache.load(context).take(slots).map { fav ->
+            WidgetItem(
+                label = fav.name.ifBlank { if (fav.type == "HOME") "집" else "장소" },
+                icon = if (fav.type == "HOME") homeIcon else placeIcon,
+                action = pendingIntentAction { openShucle(context, fav) },
+            )
+        }
+
+        // 컨테이너에 맞춰 원 크기 계산 (2열 기준)
+        val cell = minOf(params.widthDp / 2f, (params.heightDp - 8f) / rows)
+        val circleDp = (cell * 0.86f).toInt().coerceIn(40, 96)
+
         return WearWidgetDocument(
-            background = WearWidgetBrush.color(RemoteColorScheme().surfaceContainer)
+            background = WearWidgetBrush.horizontalGradient(listOf(BG_START.rc, BG_END.rc))
         ) {
-            ShucleWidgetContent(large, home, school)
+            ShucleWidgetContent(items, circleDp)
         }
     }
 }
 
-/** 셔클 자신을 extra와 함께 열기. 실제 호출 처리는 다음 단계 패치에서 */
-private fun callPendingIntent(context: Context, target: String): PendingIntent {
+private fun vector(context: Context, name: String): RemoteImageVector? = try {
+    val id = context.resources.getIdentifier(name, "drawable", context.packageName)
+    if (id == 0) null
+    else ImageVector.vectorResource(context.theme, context.resources, id).toRemoteImageVector()
+} catch (_: Throwable) {
+    null
+}
+
+/** 셔클을 목적지 정보와 함께 열기. 예약 화면 진입은 다음 단계 패치에서 처리 */
+private fun openShucle(context: Context, fav: FavoriteCache.Item): PendingIntent {
     val intent = Intent(Intent.ACTION_MAIN)
         .setComponent(ComponentName(context.packageName, MAIN_ACTIVITY))
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        .putExtra(EXTRA_WEAR_CALL, target)
+        .putExtra(EXTRA_FAVORITE_ID, fav.id)
+        .putExtra(EXTRA_DEST_NAME, fav.name)
+        .putExtra(EXTRA_DEST_LAT, fav.lat)
+        .putExtra(EXTRA_DEST_LNG, fav.lng)
     return PendingIntent.getActivity(
         context,
-        target.hashCode(),
+        fav.id.hashCode(),
         intent,
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 }
 
-/**
- * PendingIntentAction의 공개 API가 알파 버전마다 바뀌어서 생성자를 직접 찾아 씀.
- * 첫 파라미터가 PendingIntent인 구버전과 () -> PendingIntent인 신버전 모두 지원.
- */
+/** PendingIntentAction 공개 API가 알파마다 바뀌어서 생성자를 직접 사용 */
 private fun pendingIntentAction(pendingIntent: () -> PendingIntent): RemoteAction {
     val cls = Class.forName(PENDING_INTENT_ACTION)
     for (ctor in cls.declaredConstructors.sortedBy { it.parameterTypes.size }) {
@@ -112,27 +159,55 @@ private fun pendingIntentAction(pendingIntent: () -> PendingIntent): RemoteActio
 
 @RemoteComposable
 @Composable
-private fun CallButton(label: String, action: RemoteAction) {
-    RemoteButton(
-        onClick = action,
-        modifier = RemoteModifier.fillMaxWidth(),
+private fun FavoriteCircle(item: WidgetItem, circleDp: Int) {
+    RemoteBox(
+        modifier = RemoteModifier
+            .size(circleDp.rdp)
+            .clip(RemoteCircleShape)
+            .background(CIRCLE.rc)
+            .clickable(item.action),
+        contentAlignment = RemoteAlignment.Center,
     ) {
-        RemoteText(text = label.rs)
+        RemoteColumn(horizontalAlignment = RemoteAlignment.CenterHorizontally) {
+            item.icon?.let {
+                RemoteIcon(
+                    imageVector = it,
+                    contentDescription = null,
+                    modifier = RemoteModifier.size((circleDp * 0.32f).toInt().rdp),
+                    tint = ON_BG.rc,
+                )
+            }
+            RemoteText(text = item.label.rs, color = ON_BG.rc, maxLines = 1)
+        }
     }
 }
 
 @RemoteComposable
 @Composable
-fun ShucleWidgetContent(large: Boolean, home: RemoteAction, school: RemoteAction) {
+fun ShucleWidgetContent(items: List<WidgetItem>, circleDp: Int) {
     RemoteMaterialTheme {
-        RemoteColumn(
-            modifier = RemoteModifier.fillMaxSize().padding(8.rdp),
-            verticalArrangement = RemoteArrangement.spacedBy(6.rdp),
-            horizontalAlignment = RemoteAlignment.CenterHorizontally,
-        ) {
-            CallButton("집으로", home)
-            if (large) {
-                CallButton("학교로", school)
+        if (items.isEmpty()) {
+            RemoteBox(
+                modifier = RemoteModifier.fillMaxSize().padding(12.rdp),
+                contentAlignment = RemoteAlignment.Center,
+            ) {
+                RemoteText(text = "셔클을 한 번 열어 즐겨찾기를 불러오세요".rs, color = ON_BG.rc)
+            }
+        } else {
+            RemoteColumn(
+                modifier = RemoteModifier.fillMaxSize().padding(6.rdp),
+                verticalArrangement = RemoteArrangement.SpaceEvenly,
+                horizontalAlignment = RemoteAlignment.CenterHorizontally,
+            ) {
+                items.chunked(2).forEach { row ->
+                    RemoteRow(
+                        modifier = RemoteModifier.fillMaxWidth(),
+                        horizontalArrangement = RemoteArrangement.SpaceEvenly,
+                        verticalAlignment = RemoteAlignment.CenterVertically,
+                    ) {
+                        row.forEach { FavoriteCircle(it, circleDp) }
+                    }
+                }
             }
         }
     }

@@ -3,12 +3,17 @@
  */
 package app.ssch71.patches.shucle
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.patch.resourceFile
 import app.morphe.patcher.patch.resourceXml
 import app.ssch71.patches.shared.Constants.COMPATIBILITY_SHUCLE
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val WIDGET_SERVICE = "app.ssch71.extension.widget.ShucleWidgetService"
+private const val FAVORITE_CACHE = "Lapp/ssch71/extension/widget/FavoriteCache;"
 
 private val WIDGET_INFO = """
     <?xml version="1.0" encoding="utf-8"?>
@@ -34,6 +39,20 @@ val wearWidgetPatch = patch(
     extendWith("extensions/widget.mpe")
 
     execute {
+        // 즐겨찾기 매퍼의 모든 return-object 직전에 캐시 저장 호출
+        FavoriteMapperFingerprint.method.apply {
+            instructions.withIndex()
+                .filter { it.value.opcode == Opcode.RETURN_OBJECT }
+                .map { it.index to (it.value as OneRegisterInstruction).registerA }
+                .reversed()
+                .forEach { (index, register) ->
+                    addInstruction(
+                        index,
+                        "invoke-static/range {v$register .. v$register}, ${FAVORITE_CACHE}->record(Ljava/lang/Object;)V",
+                    )
+                }
+        }
+
         resourceFile("res/xml/shucle_widget_info.xml", copy = false).writeText(WIDGET_INFO)
 
         resourceXml("AndroidManifest.xml").use { manifest ->
