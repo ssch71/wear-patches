@@ -1,3 +1,9 @@
+## [1.1.0-dev.1](https://github.com/ssch71/wear-patches/compare/v1.0.1-dev.1...v1.1.0-dev.1) (2026-11-17)
+
+### ✨ New Features
+
+* **shucle:** Add width and vertical inset options to Wear UI ([542d240](https://github.com/ssch71/wear-patches/commit/542d240e98d4619d48660b49f8c82962f94bcfd8))
+
 ## [1.0.1-dev.1](https://github.com/ssch71/wear-patches/compare/v1.0.0...v1.0.1-dev.1) (2026-11-17)
 
 ### 🐛 Bug Fixes
