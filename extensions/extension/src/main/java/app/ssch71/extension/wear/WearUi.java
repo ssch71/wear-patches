@@ -14,12 +14,19 @@ import android.view.View;
 
 @SuppressWarnings({"unused", "deprecation"})
 public final class WearUi {
-    /** 폰 UI를 이 dp 폭으로 보이게 맞춤. 작을수록 글씨/버튼이 커짐 */
-    private static final float TARGET_WIDTH_DP = 260f;
-    /** 원형 화면 내접 정사각형 인셋: (1 - 1/√2) / 2 ≈ 0.146 */
+    /** 원형 화면 내접 정사각형 좌우 인셋: (1 - 1/√2) / 2 ≈ 0.146 */
     private static final float ROUND_INSET_RATIO = 0.146f;
 
+    private static float targetWidthDp = 320f;
+    private static float verticalInsetRatio = 0.10f;
+
     private WearUi() {}
+
+    /** 패치 옵션 값. onCreate 전에 호출됨 */
+    public static void configure(int widthDp, int verticalInsetPercent) {
+        if (widthDp > 0) targetWidthDp = widthDp;
+        if (verticalInsetPercent >= 0) verticalInsetRatio = verticalInsetPercent / 100f;
+    }
 
     public static void onCreate(Activity activity) {
         applyDensity(activity);
@@ -39,7 +46,7 @@ public final class WearUi {
 
         int shortPx = Math.min(dm.widthPixels, dm.heightPixels);
         float contentPx = isRound(res) ? shortPx * (1f - 2f * ROUND_INSET_RATIO) : shortPx;
-        float density = contentPx / TARGET_WIDTH_DP;
+        float density = contentPx / targetWidthDp;
         int dpi = Math.round(density * 160f);
 
         dm.density = density;
@@ -60,8 +67,10 @@ public final class WearUi {
         View content = activity.findViewById(android.R.id.content);
         if (content == null) return;
         DisplayMetrics dm = res.getDisplayMetrics();
-        int pad = Math.round(Math.min(dm.widthPixels, dm.heightPixels) * ROUND_INSET_RATIO);
-        content.setPadding(pad, pad, pad, pad);
+        int shortPx = Math.min(dm.widthPixels, dm.heightPixels);
+        int h = Math.round(shortPx * ROUND_INSET_RATIO);
+        int v = Math.round(shortPx * verticalInsetRatio);
+        content.setPadding(h, v, h, v);
     }
 
     private static final class Callbacks implements Application.ActivityLifecycleCallbacks {
