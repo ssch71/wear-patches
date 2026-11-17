@@ -1,3 +1,9 @@
+## [1.1.0-dev.7](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.6...v1.1.0-dev.7) (2026-11-17)
+
+### ✨ New Features
+
+* Route widget via DRT service deep link, rotary bezel scrolling ([f460ed9](https://github.com/ssch71/wear-patches/commit/f460ed9f9c110fde92364826d308faa6467ac635))
+
 ## [1.1.0-dev.6](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.5...v1.1.0-dev.6) (2026-11-17)
 
 ### 🐛 Bug Fixes
