@@ -1,3 +1,9 @@
+## [1.1.0-dev.3](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2026-11-17)
+
+### ✨ New Features
+
+* **widget:** One UI style favorites widget from Shucle favorites ([9403b31](https://github.com/ssch71/wear-patches/commit/9403b310261f52e1bfb5d5bb1e85ed189e724c6b))
+
 ## [1.1.0-dev.2](https://github.com/ssch71/wear-patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-11-17)
 
 ### ✨ New Features
