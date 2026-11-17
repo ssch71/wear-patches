@@ -5,15 +5,20 @@ package app.ssch71.patches.shucle
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
+import app.morphe.patcher.patch.classDefForEach
+import app.morphe.patcher.patch.mutableClassDefBy
 import app.morphe.patcher.patch.patch
 import app.morphe.patcher.patch.resourceFile
 import app.morphe.patcher.patch.resourceXml
 import app.ssch71.patches.shared.Constants.COMPATIBILITY_SHUCLE
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val WIDGET_SERVICE = "app.ssch71.extension.widget.ShucleWidgetService"
 private const val FAVORITE_CACHE = "Lapp/ssch71/extension/widget/FavoriteCache;"
+private const val WIDGET_LAUNCH = "Lapp/ssch71/extension/widget/WidgetLaunch;"
+private const val FAVORITE_TYPE = "Lcom/hyundai/airlab/shucle/core/domain/model/Favorite;"
 
 private val WIDGET_INFO = """
     <?xml version="1.0" encoding="utf-8"?>
@@ -39,6 +44,36 @@ val wearWidgetPatch = patch(
     extendWith("extensions/widget.mpe")
 
     execute {
+        // 위젯에서 넘어온 즐겨찾기 id 수집
+        ShucleMainActivityOnCreateFingerprint.method.addInstruction(
+            0,
+            "invoke-static/range {p0 .. p0}, ${WIDGET_LAUNCH}->onActivityCreated(Landroid/app/Activity;)V",
+        )
+
+        // static void xxx(Favorite, 클릭람다, Composer, int) 형태 칩 컴포저블 진입부 훅
+        val chipMethods = mutableListOf<Pair<String, String>>()
+        classDefForEach { classDef ->
+            classDef.methods.forEach { m ->
+                val params = m.parameterTypes.map { it.toString() }
+                if (AccessFlags.STATIC.isSet(m.accessFlags) &&
+                    m.returnType == "V" &&
+                    params.size == 4 &&
+                    params[0] == FAVORITE_TYPE &&
+                    params[1].startsWith("L") && params[1] != FAVORITE_TYPE &&
+                    params[3] == "I" &&
+                    m.implementation != null
+                ) chipMethods += classDef.type to (m.name + params.joinToString(""))
+            }
+        }
+        chipMethods.forEach { (type, signature) ->
+            mutableClassDefBy(type).methods
+                .first { it.name + it.parameterTypes.joinToString("") == signature }
+                .addInstruction(
+                    0,
+                    "invoke-static/range {p0 .. p1}, ${WIDGET_LAUNCH}->onFavoriteChip(Ljava/lang/Object;Ljava/lang/Object;)V",
+                )
+        }
+
         // 즐겨찾기 매퍼의 모든 return-object 직전에 캐시 저장 호출
         FavoriteMapperFingerprint.method.apply {
             instructions.withIndex()

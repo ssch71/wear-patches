@@ -50,14 +50,29 @@ val wearUiPatch = patch(
         validator = { it != null && it in 0..20 },
     )
 
+    val fontScalePercent by intOption(
+        key = "fontScalePercent",
+        default = 85,
+        values = mapOf(
+            "작게 (75%)" to 75,
+            "조금 작게 (85%)" to 85,
+            "기본 (100%)" to 100,
+        ),
+        title = "글자 배율",
+        description = "앱 글자 크기 배율. 바텀시트처럼 글자가 많은 화면의 높이가 줄어듭니다.",
+        required = true,
+        validator = { it != null && it in 50..150 },
+    )
+
     execute {
-        // 메서드 시작 시점이라 로컬 v0, v1은 비어 있음
+        // 메서드 시작 시점이라 로컬 v0~v2는 비어 있음
         ShucleMainActivityOnCreateFingerprint.method.addInstructions(
             0,
             """
                 const/16 v0, ${targetWidthDp!!}
                 const/16 v1, ${verticalInsetPercent!!}
-                invoke-static {v0, v1}, ${EXTENSION_CLASS}->configure(II)V
+                const/16 v2, ${fontScalePercent!!}
+                invoke-static {v0, v1, v2}, ${EXTENSION_CLASS}->configure(III)V
                 invoke-static/range {p0 .. p0}, ${EXTENSION_CLASS}->onCreate(Landroid/app/Activity;)V
             """
         )

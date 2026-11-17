@@ -9,3 +9,4 @@
 -keep class androidx.compose.remote.creation.compose.action.PendingIntentAction { <init>(...); }
 # 셔클 바이트코드에서 직접 호출
 -keep class app.ssch71.extension.widget.FavoriteCache { *; }
+-keep class app.ssch71.extension.widget.WidgetLaunch { *; }

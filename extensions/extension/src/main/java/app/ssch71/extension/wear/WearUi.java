@@ -22,13 +22,15 @@ public final class WearUi {
 
     private static float targetWidthDp = 320f;
     private static float verticalInsetRatio = 0.10f;
+    private static float fontScale = 0.85f;
 
     private WearUi() {}
 
     /** 패치 옵션 값. onCreate 전에 호출됨 */
-    public static void configure(int widthDp, int verticalInsetPercent) {
+    public static void configure(int widthDp, int verticalInsetPercent, int fontScalePercent) {
         if (widthDp > 0) targetWidthDp = widthDp;
         if (verticalInsetPercent >= 0) verticalInsetRatio = verticalInsetPercent / 100f;
+        if (fontScalePercent > 0) fontScale = fontScalePercent / 100f;
     }
 
     public static void onCreate(Activity activity) {
@@ -53,6 +55,7 @@ public final class WearUi {
         int dpi = Math.round(density * 160f);
 
         dm.density = density;
+        conf.fontScale = conf.fontScale * fontScale;
         dm.scaledDensity = density * conf.fontScale;
         dm.densityDpi = dpi;
 

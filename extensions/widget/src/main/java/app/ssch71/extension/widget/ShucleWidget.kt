@@ -10,6 +10,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.remote.creation.compose.action.RemoteAction
 import androidx.compose.remote.creation.compose.capture.RemoteImageVector
 import androidx.compose.remote.creation.compose.capture.toRemoteImageVector
@@ -33,6 +34,7 @@ import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rdp
 import androidx.compose.remote.creation.compose.state.rf
 import androidx.compose.remote.creation.compose.state.rs
+import androidx.compose.remote.creation.compose.state.rsp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -93,9 +95,9 @@ class ShucleWidget : GlanceWearWidget() {
         }
 
         // 칸(2열 x rows행)에 꽉 맞는 원 지름
-        val cellW = (params.widthDp - 8f) / 2f
-        val cellH = (params.heightDp - 8f) / rows
-        val circleDp = (minOf(cellW, cellH) - 4f).toInt().coerceAtLeast(40)
+        val cellW = params.widthDp / 2f
+        val cellH = params.heightDp / rows
+        val circleDp = minOf(cellW, cellH).toInt().coerceAtLeast(40)
 
         return WearWidgetDocument(
             background = WearWidgetBrush.verticalGradient(listOf(BG_TOP.rc, BG_MID.rc, BG_BOTTOM.rc))
@@ -115,9 +117,9 @@ private fun vector(context: Context, name: String): RemoteImageVector? = try {
 
 /** 셔클을 목적지 정보와 함께 열기. 예약 화면 진입은 다음 단계 패치에서 처리 */
 private fun openShucle(context: Context, fav: FavoriteCache.Item): PendingIntent {
-    val intent = Intent(Intent.ACTION_MAIN)
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("shucle://drthome"))
         .setComponent(ComponentName(context.packageName, MAIN_ACTIVITY))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         .putExtra(EXTRA_FAVORITE_ID, fav.id)
         .putExtra(EXTRA_DEST_NAME, fav.name)
         .putExtra(EXTRA_DEST_LAT, fav.lat)
@@ -181,11 +183,16 @@ private fun FavoriteCircle(item: WidgetItem, circleDp: Int, cellModifier: Remote
                     RemoteIcon(
                         imageVector = it,
                         contentDescription = null,
-                        modifier = RemoteModifier.size((circleDp * 0.30f).toInt().rdp),
+                        modifier = RemoteModifier.size((circleDp * 0.34f).toInt().rdp),
                         tint = ON_BG.rc,
                     )
                 }
-                RemoteText(text = item.label.rs, color = ON_BG.rc, maxLines = 1)
+                RemoteText(
+                    text = item.label.rs,
+                    color = ON_BG.rc,
+                    fontSize = (circleDp * 0.20f).toInt().coerceAtLeast(12).rsp,
+                    maxLines = 1,
+                )
             }
         }
     }
@@ -204,7 +211,7 @@ fun ShucleWidgetContent(items: List<WidgetItem>, circleDp: Int) {
             }
         } else {
             RemoteColumn(
-                modifier = RemoteModifier.fillMaxSize().padding(4.rdp),
+                modifier = RemoteModifier.fillMaxSize(),
                 verticalArrangement = RemoteArrangement.SpaceEvenly,
                 horizontalAlignment = RemoteAlignment.CenterHorizontally,
             ) {
